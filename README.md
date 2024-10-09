@@ -3,7 +3,7 @@
 This is here to support the Blog Post http://mvpjava.com/docker-java-development-environment-intellij
 and the You Tube Tutorial https://youtu.be/HUj1RbwYXVQ
 
-+ Note: Only works if your running Docker on a Linux host/VM
++ Note: Only works if your running Docker on a Mac host/VM
 
 This is meant for Java Developers who want to run their IntelliJ IDEA in a Docker Container.
 
@@ -16,7 +16,7 @@ So IntelliJ plugins and preferences are preserved as well as maven $HOME/.m2 dir
 so you don't have to keep downloading the same artifacts.
 
 You can share your source code with the IntelliJ. Just place you source code in (default location) ..
-${HOME}/IdeaIC2020.3/IdeaProjects
+${HOME}/IdeaIC2024.2/IdeaProjects
 
 
 # How to start Docker Container

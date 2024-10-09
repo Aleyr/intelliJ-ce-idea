@@ -1,56 +1,54 @@
-FROM azul/zulu-openjdk:11.0.10-11.45.27
+FROM eclipse-temurin:21-alpine
 
-MAINTAINER Andy Luis "MVP Java - mvpjava.com, triomni-it.com"
+LABEL org.opencontainers.image.authors="Aleyr Lengiac - aleyr7+github@gmail.com"
 
 # This makes debconf use a frontend that expects no interactive input at all,
 # preventing it from even trying to access stdin (this avoiding a big red error
 # message in console output)
-ENV  DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
-  && apt-get install -y apt-utils \
-  && apt-get install -y libcanberra-gtk3-module \
-  && apt-get install -y curl wget vim \
-  && apt-cache policy git \
-  && apt-get -y install git \
-  && apt-get install -y sudo \
-  && apt-get clean  \
-  && rm -rf /var/lib/apt/lists/* \ 
-  && rm -rf /tmp/*  \
-  && rm -rf /var/cache/apk/*
+RUN apk update \
+  && apk upgrade \
+  && apk add curl wget vim \
+  && apk add git sudo shadow \ 
+  && apk add xfce4 xfce4-terminal xfce4-screensaver lightdm-gtk-greeter
 
 ##############################################
 # Install Maven
 ##############################################
-
-ARG MAVEN_TARBALL=apache-maven-3.6.3-bin.tar.gz
-ARG MAVEN_VERSION=apache-maven-3.6.3
+# Latest version at this time
+ARG MAVEN_VERSION_NUMBER=3.9.9
+ARG MAVEN_VERSION=apache-maven-${MAVEN_VERSION_NUMBER}
+ARG MAVEN_TARBALL=${MAVEN_VERSION}-bin.tar.gz
 ARG MAVEN_INSTALL_DIR=/usr/local/src
 
-COPY ${MAVEN_TARBALL} $MAVEN_INSTALL_DIR
+ADD https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION_NUMBER}/binaries/${MAVEN_TARBALL} ${MAVEN_INSTALL_DIR}/${MAVEN_TARBALL}
 
-RUN cd $MAVEN_INSTALL_DIR        \
-  &&  tar -xf  "$MAVEN_TARBALL"  \
-  && rm -f "$MAVEN_TARBALL"      
+RUN cd ${MAVEN_INSTALL_DIR}        \
+  &&  tar -xf  "${MAVEN_TARBALL}"  \
+  && rm -f "${MAVEN_TARBALL}"      
 
-# Note (from base image) : JAVA_HOME=/usr/lib/jvm/zulu11-ca-amd64
 # Setup MAVEN ENVironment variables
 ENV M2_HOME=${MAVEN_INSTALL_DIR}/${MAVEN_VERSION}
 ENV PATH=${M2_HOME}/bin:${PATH}
+ENV JAVA_BIN=${JAVA_HOME}/bin/java
 
 ##############################################
 # Install IntelliJ Community Edition IDEA
 ##############################################
-ARG IJ_TARBALL=ideaIC-2020.3.1.tar.gz
-ARG IJ_VERSION=IntelliJIdea2020.3
+# Latest version at this time
+ARG IJ_VERSION=2024.2.3
+ARG IJ_TARBALL=ideaIC-${IJ_VERSION}.tar.gz
+ARG IJ_EXTRACT=idea-IC-${IJ_VERSION}
 ARG IJ_INSTALL_DIR=/opt
-ENV IJ_SETUP_SCRIPT_DIR_CNTR=${IJ_INSTALL_DIR}/idea-IC-203.6682.168/bin
 
-COPY ${IJ_TARBALL} $IJ_INSTALL_DIR 
+ADD https://download.jetbrains.com/idea/${IJ_TARBALL} ${IJ_INSTALL_DIR}/${IJ_TARBALL}
 
 RUN  cd ${IJ_INSTALL_DIR}   \
   && tar -xf  ${IJ_TARBALL} \
   && rm -f ${IJ_TARBALL}
+
+ENV IJ_SETUP_SCRIPT_DIR_CNTR=${IJ_INSTALL_DIR}/idea-IC-242.23339.11/bin
 
 ###############################################################
 # Removes accessibility warning (known bug) in console log 
