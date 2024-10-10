@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-alpine
+FROM azul/zulu-openjdk:23-latest
 
 LABEL org.opencontainers.image.authors="Aleyr Lengiac - aleyr7+github@gmail.com"
 
@@ -7,11 +7,10 @@ LABEL org.opencontainers.image.authors="Aleyr Lengiac - aleyr7+github@gmail.com"
 # message in console output)
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apk update \
-  && apk upgrade \
-  && apk add curl wget vim \
-  && apk add git sudo shadow \ 
-  && apk add xfce4 xfce4-terminal xfce4-screensaver lightdm-gtk-greeter
+RUN apt-get update \
+  && apt-get upgrade \
+  && apt-get install -y curl wget vim \
+  && apt-get install -y git sudo
 
 ##############################################
 # Install Maven
@@ -22,7 +21,8 @@ ARG MAVEN_VERSION=apache-maven-${MAVEN_VERSION_NUMBER}
 ARG MAVEN_TARBALL=${MAVEN_VERSION}-bin.tar.gz
 ARG MAVEN_INSTALL_DIR=/usr/local/src
 
-ADD https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION_NUMBER}/binaries/${MAVEN_TARBALL} ${MAVEN_INSTALL_DIR}/${MAVEN_TARBALL}
+#ADD https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION_NUMBER}/binaries/${MAVEN_TARBALL} ${MAVEN_INSTALL_DIR}/${MAVEN_TARBALL}
+COPY ${MAVEN_TARBALL} ${MAVEN_INSTALL_DIR}/${MAVEN_TARBALL}
 
 RUN cd ${MAVEN_INSTALL_DIR}        \
   &&  tar -xf  "${MAVEN_TARBALL}"  \
@@ -42,13 +42,16 @@ ARG IJ_TARBALL=ideaIC-${IJ_VERSION}.tar.gz
 ARG IJ_EXTRACT=idea-IC-${IJ_VERSION}
 ARG IJ_INSTALL_DIR=/opt
 
-ADD https://download.jetbrains.com/idea/${IJ_TARBALL} ${IJ_INSTALL_DIR}/${IJ_TARBALL}
+#ADD https://download.jetbrains.com/idea/${IJ_TARBALL} ${IJ_INSTALL_DIR}/${IJ_TARBALL}
+COPY ${IJ_TARBALL} ${IJ_INSTALL_DIR}/${IJ_TARBALL}
 
 RUN  cd ${IJ_INSTALL_DIR}   \
   && tar -xf  ${IJ_TARBALL} \
   && rm -f ${IJ_TARBALL}
 
-ENV IJ_SETUP_SCRIPT_DIR_CNTR=${IJ_INSTALL_DIR}/idea-IC-242.23339.11/bin
+RUN ls /opt | grep idea > /opt/idea_path.txt | export IJ_INSTALL_DIR_NAME=$(cat /opt/idea_path.txt)
+
+ENV IJ_SETUP_SCRIPT_DIR_CNTR=${IJ_INSTALL_DIR}/${IJ_INSTALL_DIR_NAME}/bin
 
 ###############################################################
 # Removes accessibility warning (known bug) in console log 

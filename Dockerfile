@@ -1,4 +1,4 @@
-FROM aleyr/intellij-ide-base:21-alpine
+FROM aleyr/intellij-ide-base:23-azul
 
 LABEL org.opencontainers.image.authors="Aleyr Lengiac - aleyr7+github@gmail.com"
 
@@ -9,7 +9,7 @@ LABEL org.opencontainers.image.authors="Aleyr Lengiac - aleyr7+github@gmail.com"
 # However that won't persist the data on host machine after 
 # container is terminated so for best experience use the run.sh
 # script that does this for you.
-ARG USER=desantos      
+ARG USER=nobody      
 
 RUN echo "Will use USER=${USER}"
 
@@ -45,7 +45,5 @@ RUN mkdir -p ${HOME} &&   \
 USER ${USER}
 WORKDIR ${HOME}
 
-RUN echo "${IJ_SETUP_SCRIPT_DIR_CNTR}"
-
-#ENTRYPOINT  ["sh", "-c", "${IJ_SETUP_SCRIPT_DIR_CNTR}/idea.sh"]
+ENTRYPOINT  ["sh", "-c", "${IJ_SETUP_SCRIPT_DIR_CNTR}/idea.sh"]
 #CMD sh

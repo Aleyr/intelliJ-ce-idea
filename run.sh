@@ -74,10 +74,12 @@ chmod -R 764 ${IJ_ROOT_DIR_HOST}
 #########################################################
 xhost +
 
-echo "USER=${USER}"
-
+###########################################################
+# For Mac OS the environment variable is not $DISPLAY but
+# docker.for.mac.host.internal:0
+###########################################################
 docker container run -d --rm -it                   \
--e DISPLAY=${DISPLAY}                              \
+-e DISPLAY=docker.for.mac.host.internal:0          \
 -v ${HOME}/.Xauthority:/home/${USER}/.Xauthority   \
 -v /tmp/.X11-unix:/tmp/.X11-unix                   \
 -v /var/run/docker.sock:/var/run/docker.sock       \
@@ -89,8 +91,7 @@ docker container run -d --rm -it                   \
 -v ${IJ_USER_PREFS_HOST}:${IJ_USER_PREFS_CNTR}     \
 -h jetbrains                                       \
 --name  ij-ce-ide-jdk21                            \
-aleyr/intellij-ide:latest -- sh
-
+aleyr/intellij-ide:latest
 
 
 #docker run --rm -it aleyr/intellij-ide:latest -- sh
